@@ -69,6 +69,7 @@
         const action = button.dataset.action;
         if(action === 'back') history.back();
         else if(action === 'reload') location.reload();
+        else if(action === 'hide') await window.__TAURI__.core.invoke('hide_to_background');
         else {
           const win = window.__TAURI__.window.getCurrentWindow();
           if(action === 'fullscreen') await win.setFullscreen(!(await win.isFullscreen()));

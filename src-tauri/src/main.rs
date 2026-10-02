@@ -1,7 +1,20 @@
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 
+#[tauri::command]
+fn hide_to_background(app: tauri::AppHandle) -> Result<(), String> {
+    if let Some(window) = app.get_webview_window("main") {
+        window.hide().map_err(|error| error.to_string())?;
+    }
+    #[cfg(target_os = "macos")]
+    app.set_activation_policy(tauri::ActivationPolicy::Accessory)
+        .map_err(|error| error.to_string())?;
+    Ok(())
+}
+
 fn show_main(app: &tauri::AppHandle) {
+    #[cfg(target_os = "macos")]
+    let _ = app.set_activation_policy(tauri::ActivationPolicy::Regular);
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.unminimize();
         let _ = window.show();
@@ -11,6 +24,7 @@ fn show_main(app: &tauri::AppHandle) {
 
 fn main() {
     let app = tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![hide_to_background])
         .setup(|app| {
             let show = MenuItem::with_id(app, "show", "Show Roam", true, Some("CmdOrCtrl+1"))?;
             let hide = MenuItem::with_id(app, "hide", "Close Window", true, Some("CmdOrCtrl+W"))?;
@@ -91,7 +105,7 @@ fn main() {
             window.on_window_event(move |event| {
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                     api.prevent_close();
-                    let _ = handle.hide();
+                    let _ = hide_to_background(handle.app_handle().clone());
                 }
             });
             Ok(())
@@ -99,9 +113,7 @@ fn main() {
         .on_menu_event(|app, event| match event.id().as_ref() {
             "show" => show_main(app),
             "hide" | "background" => {
-                if let Some(w) = app.get_webview_window("main") {
-                    let _ = w.hide();
-                }
+                let _ = hide_to_background(app.clone());
             }
             "quit-completely" => app.exit(0),
             "reload" => {

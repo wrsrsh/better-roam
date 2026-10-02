@@ -1,0 +1,4 @@
+[[permission]]
+identifier = "allow-hide-to-background"
+description = "Hide the main window and remove its Dock icon while retaining the webview."
+commands.allow = ["hide_to_background"]

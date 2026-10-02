@@ -45,10 +45,10 @@ A manually triggered GitHub Actions workflow can build another installer. It is 
 - The top-right `⋯` opens Back, Reload, Full Screen, Minimize, and Close Window.
 - Drag the `⋯` button to move the window.
 - Close Window / Cmd+W hides the window, retaining the loaded graph and webview in memory.
-- Click the Dock icon or use Roam Desktop → Show Roam to bring it back.
-- Cmd+Q / Keep Roam in Background hides the window without destroying the webview or loaded graph. The process and Dock icon remain available, and the app continues using memory.
+- Open Roam Desktop from Applications or Spotlight to bring it back.
+- Cmd+Q / Keep Roam in Background hides the window without destroying the webview or loaded graph. The process continues using memory, but its Dock icon and app-switcher entry disappear while hidden.
 - Shift+Cmd+Q / Quit Completely exits the process and releases its memory.
-- Reopening from the Dock or launching the running app brings back the same window without reloading it.
+- Launching the running app brings back the same window without reloading it.
 - macOS shutdown/restart and Force Quit still terminate the app; this does not keep a graph alive across reboot.
 - Standard Edit menu actions support copy/paste and text editing.
 
