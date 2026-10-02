@@ -1,0 +1,26 @@
+name: Build macOS installer
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install stable Rust
+        run: rustup toolchain install stable --profile minimal && rustup default stable
+      - run: npm ci
+      - name: Build ad-hoc signed installer
+        run: npm run build
+      - name: Verify app signature
+        run: codesign --verify --deep --strict --verbose=2 'src-tauri/target/release/bundle/macos/Roam Desktop.app'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: roam-desktop-macos
+          path: src-tauri/target/release/bundle/dmg/*.dmg
+          if-no-files-found: error
