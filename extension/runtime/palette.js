@@ -1,3 +1,4 @@
+import {parseSearch} from './advanced-search.js';
 import {createSearchSession, searchGraph} from './palette-search.js';
 
 export function installPalette() {
@@ -28,10 +29,12 @@ export function installPalette() {
     const action = (label, run, keywords = '') => ({kind: 'action', label, detail: 'Action', run, keywords});
     const actions = [
       action('Create new page', () => window.__betterRoamAction('new-page'), 'new file note'),
-      action('Advanced search', () => window.__betterRoamAction('search'), 'find'),
+      action('Search within a page', () => {}, 'advanced search filter in',),
       action('Open settings', () => window.__betterRoamAction('settings'), 'preferences'),
       action('All Roam commands', () => window.__betterRoamAction('roam-palette'), 'native commands'),
     ];
+    actions[1].fill = 'in:"" ';
+    actions.push({...action('Search linked references', () => {}, 'advanced search filter tag reference'), fill: 'ref:"" '});
     const add = (label, owner, method, keywords) => {
       if (typeof owner?.[method] === 'function') actions.push(action(label, () => owner[method](), keywords));
     };
@@ -40,6 +43,7 @@ export function installPalette() {
     add('Hide left sidebar', api?.ui?.leftSidebar, 'close', 'navigation');
     add('Show right sidebar', api?.ui?.rightSidebar, 'open', 'split pane');
     add('Hide right sidebar', api?.ui?.rightSidebar, 'close', 'split pane');
+    const searchSpec = () => {try {return parseSearch(query());} catch {return {advanced: true};}};
     const query = () => input.value.replace(/^>\s*/, '').trim();
     const kind = () => input.value.startsWith('>') ? 'actions' : 'all';
     const select = index => {
@@ -51,6 +55,7 @@ export function installPalette() {
     };
     const activate = async (item, sidebar = false) => {
       if (!item || busy || scope() !== originalScope) return;
+      if (item.fill) {input.value = item.fill; refresh(); input.focus(); input.setSelectionRange(input.value.indexOf('"') + 1, input.value.indexOf('"') + 1); return;}
       if (item.kind === 'action') {close(); await item.run(); return;}
       busy = true; status.textContent = item.kind === 'create' ? 'Creating page…' : 'Opening…';
       try {
@@ -73,30 +78,32 @@ export function installPalette() {
     const render = () => {
       if (closed) return;
       const text = query().toLowerCase(), mode = kind();
-      const matches = actions.filter(a => text.split(/\s+/).every(word => `${a.label} ${a.keywords}`.toLowerCase().includes(word)));
-      items = mode === 'actions' ? matches : [...hits, ...(mode === 'all' ? matches : [])];
-      if (text && mode !== 'actions' && mode !== 'blocks' && !loading && !error && !hits.some(h => h.kind === 'page' && h.label.toLowerCase() === text)) {
+      const matches = (text || mode === 'actions' ? actions : []).filter(a => text.split(/\s+/).every(word => `${a.label} ${a.keywords}`.toLowerCase().includes(word)));
+      const previousItem = items[selected];
+      items = mode === 'actions' ? matches : [...hits, ...(searchSpec().advanced ? [] : matches.slice(0, 3))];
+      if (text && !searchSpec().advanced && mode !== 'actions' && mode !== 'blocks' && !loading && !error && !hits.some(h => h.kind === 'page' && h.label.toLowerCase() === text)) {
         items.push({kind: 'create', label: `Create “${query()}”`, detail: 'New page'});
       }
+      list.hidden = !items.length;
       list.replaceChildren();
       items.forEach((item, i) => {
         const row = document.createElement('div');
         row.id = `br-result-${i}`; row.className = 'br-result'; row.setAttribute('role', 'option');
-        const icon = document.createElement('span'); icon.className = 'br-result-icon'; icon.setAttribute('aria-hidden', 'true');
-        icon.textContent = {page: '▤', block: '•', action: '⌘', create: '+'}[item.kind];
         const body = document.createElement('span'); body.className = 'br-result-body';
         const title = document.createElement('span'); title.className = 'br-result-title'; title.textContent = item.label.slice(0, 220);
         const detail = document.createElement('span'); detail.className = 'br-result-detail'; detail.textContent = item.kind === 'block' && item.detail !== 'Block' ? item.detail : '';
-        body.append(title, detail); row.append(icon, body);
+        body.append(title, detail); row.append(body);
         row.onmousedown = event => event.preventDefault();
         row.onclick = event => {void activate(item, event.shiftKey).catch(() => {});};
         list.append(row);
       });
-      status.textContent = error || (loading ? 'Searching…' : !items.length ? (text ? 'No matches.' : 'Type to search your graph.') : '');
-      select(0);
+      status.textContent = error || (!loading && text && !items.length ? 'No matches.' : '');
+      input.setAttribute('aria-busy', String(loading));
+      const same = previousItem && items.findIndex(item => item.kind === previousItem.kind && (item.uid ? item.uid === previousItem.uid : item.label === previousItem.label));
+      select(same >= 0 ? same : 0);
     };
     const session = createSearchSession({scope, search: (text, mode) => searchGraph(api, text, mode),
-      deliver(rows, failure) {hits = rows; loading = false; error = failure ? 'Search unavailable. Try Advanced search from Actions.' : ''; render();},
+      deliver(rows, failure) {hits = rows; loading = false; error = failure ? (() => {try {parseSearch(query());} catch (error) {return error.message;} return 'Search unavailable. Try again when the graph is ready.';})() : ''; render();},
     });
     const refresh = () => {
       if (busy) return;

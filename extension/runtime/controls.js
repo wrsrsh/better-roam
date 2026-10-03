@@ -184,24 +184,7 @@
     if (action === 'roam-palette') { openPalette(); return; }
     if (action === 'new-page') { newPage(); return; }
     if (action === 'palette') { window.__betterRoamPalette?.(); return; }
-    if (action === 'search') {
-      const existing = document.querySelector('#rm-find-or-create-modal-input');
-      if (existing) { existing.focus(); existing.select(); return; }
-      openDialogCommand();
-      let attempts = 0;
-      const chooseSearch = () => {
-        const entry = [...document.querySelectorAll('.rm-command-palette__menu .rm-menu-item')]
-          .find(el => el.textContent.trim().startsWith('Open advanced search'));
-        if (entry) {
-          try { entry.click(); } finally { setTimeout(finishDialogCommand, 150); }
-          return;
-        }
-        if (++attempts < 20) setTimeout(chooseSearch, 50);
-        else { finishDialogCommand(); console.warn('Roam advanced search command not available yet'); }
-      };
-      chooseSearch();
-      return;
-    }
+    if (action === 'search') { window.__betterRoamPalette?.(); return; }
     if (action === 'settings') {
       if (document.querySelector('.rm-settings')) return;
       openDialogCommand();

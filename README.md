@@ -6,7 +6,7 @@ Craft light/dark theme, a compact unified command palette, quick page creation w
 
 ## install
 
-[download the extension](https://github.com/wrsrsh/betterroam/releases/latest), unzip it, then open `chrome://extensions`. enable **Developer mode**, click **Load unpacked**, and select the extracted folder. reload Roam.
+[download the extension](https://github.com/wrsrsh/better-roam/releases/latest), unzip it, then open `chrome://extensions`. enable **Developer mode**, click **Load unpacked**, and select the extracted folder. reload Roam.
 
 ## shortcuts
 
@@ -21,7 +21,9 @@ Alt is Option on Mac. customize at `chrome://extensions/shortcuts`; Chrome reser
 
 ⌘K searches pages and block text. type `>` to show only commands. press Enter to open a result, Shift+Enter for the sidebar, or choose **Create** to make a page. settings, daily notes, sidebars, and Roam's full command menu are also available.
 
-Search runs only while the palette is open, with debouncing, at most one request at a time, and up to 40 graph results. it uses Roam's async search when available; no extra graph index or background sync.
+Advanced search is built into the same field: `"exact phrase"`, `in:"Page name"`, `ref:"Tag"`, `-exclude`, and `type:page` or `type:block`. Terms combine with AND; `ref:` matches direct references. Type `advanced` for an in-place filter suggestion.
+
+Search runs only while the palette is open, with debouncing, at most one request at a time, and up to 40 graph results. ordinary search uses Roam's async search when available; advanced filters require its async query API and have a two-second query timeout; no extra graph index or background sync.
 
 ## develop
 

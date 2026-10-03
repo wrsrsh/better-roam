@@ -19,10 +19,12 @@ function fixture() {
   // a wrapper to keep tests isolated from node's globals.
   return {dom,w,calls};
 }
+import {parseSearch} from '../extension/runtime/advanced-search.js';
 import {createSearchSession,searchGraph} from '../extension/runtime/palette-search.js';
 function mount(x) {
   x.w.createSearchSession=createSearchSession;
   x.w.searchGraph=searchGraph;
+  x.w.parseSearch=parseSearch;
   x.w.eval(`(${installPalette.toString()})()`);
   x.w.document.getElementById('editor').focus();
   x.w.__betterRoamPalette();
@@ -84,4 +86,26 @@ test('native actions dispatch inside Roam when focus is outside its React root',
   x.w.eval(readFileSync(new URL('../extension/runtime/controls.js',import.meta.url),'utf8'));
   x.w.__betterRoamAction('roam-palette');
   assert.deepEqual(keys,['p']);x.dom.window.close();
+});
+test('empty palette stays quiet and advanced search is edited in place', async () => {
+  const x=fixture();const input=mount(x);
+  assert.equal(x.w.document.getElementById('br-palette-results').hidden,true);
+  assert.equal(x.w.document.querySelector('[role="status"]').textContent,'');
+  assert.equal(x.w.document.querySelector('.br-result-icon'),null);
+  input.value='advanced';input.dispatchEvent(new x.w.Event('input'));await wait(170);
+  const option=[...x.w.document.querySelectorAll('[role="option"]')].find(n=>n.textContent.includes('Search within a page'));
+  assert.ok(option);option.click();
+  assert.equal(input.value,'in:"" ');
+  assert.ok(x.w.document.querySelector('dialog'));
+  assert.equal(x.calls.length,0);
+  x.dom.window.close();
+});
+test('advanced filters search the graph in the palette without suggesting a page named after the query', async () => {
+  const x=fixture();let queried=0;
+  x.w.roamAlphaAPI.data.async.q=async()=>{queried++;return [['b','Scoped result','block','Projects']];};
+  const input=mount(x);input.value='in:"Projects" -old';input.dispatchEvent(new x.w.Event('input'));await wait(170);
+  assert.equal(queried,1);
+  assert.equal(x.w.document.querySelector('[role="option"]').textContent,'Scoped resultProjects');
+  assert.doesNotMatch(x.w.document.getElementById('br-palette-results').textContent,/Create/);
+  x.dom.window.close();
 });

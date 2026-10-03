@@ -7,11 +7,11 @@ test('search uses the bounded async API and preserves receiver', async () => {
   const owner = {async search(args) {
     assert.equal(this, owner); calls++;
     assert.equal(args.limit, 40); assert.equal(args['search-pages'], true); assert.equal(args['search-blocks'], false);
-    assert.equal(args['search-str'], 'a "quoted" title');
+    assert.equal(args['search-str'], 'a plain title');
     return [{':block/uid': '1', ':node/title': 'Page'}, {':block/uid': '1', ':node/title': 'duplicate'}, {':block/uid': '2', ':block/string': 'block'}, {}];
   }};
   const api = {data: {async: owner, search() {throw Error('sync path should not run');}}};
-  assert.deepEqual(await searchGraph(api, '  a "quoted" title ', 'pages'), [{uid: '1', kind: 'page', label: 'Page', detail: 'Page'}]);
+  assert.deepEqual(await searchGraph(api, '  a plain title ', 'pages'), [{uid: '1', kind: 'page', label: 'Page', detail: 'Page'}]);
   assert.equal(calls, 1);
   assert.deepEqual(await searchGraph(api, ''), []); assert.equal(calls, 1);
 });

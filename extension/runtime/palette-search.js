@@ -1,7 +1,10 @@
+import {parseSearch, advancedSearch} from './advanced-search.js';
 // Use Roam's bounded search, preferably its async/search-worker API. No local
 // graph mirror, subscriptions, background indexing, or persistent result cache.
 export async function searchGraph(api, text, kind = 'all') {
   if (!text.trim()) return [];
+  const spec = parseSearch(text);
+  if (spec.advanced) return advancedSearch(api, spec);
   const owner = typeof api?.data?.async?.search === 'function' ? api.data.async : api?.data;
   if (typeof owner?.search !== 'function') throw new Error('Search is unavailable until this graph finishes loading.');
   const rows = await owner.search({

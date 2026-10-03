@@ -50,9 +50,9 @@ test('settings reuses an open palette and activates the settings command',()=>{
   const x=setup({palette:true});x.window.__betterRoamAction('settings');
   assert.equal(x.state.settings,true);assert.deepEqual(x.keys,[]);
 });
-test('search invokes advanced search instead of the navbar input',()=>{
+test('search opens the unified palette with built-in advanced search',()=>{
   const x=setup();x.window.__betterRoamAction('search');
-  assert.equal(x.state.search,true);assert.equal(x.state.focused,false);
+  assert.equal(x.state.palette,true);assert.equal(x.state.focused,false);
 });
 test('Cmd+K consumes the editor link shortcut and opens the palette',()=>{
   const x=setup();let cancelled=false;
