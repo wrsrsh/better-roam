@@ -1,16 +1,19 @@
 import { defineBackground } from 'wxt/utils/define-background';
 import { browser } from 'wxt/browser';
+import { createTabKeeper } from '../runtime/keep-loaded.js';
 export default defineBackground(() => {
-  browser.action.onClicked.addListener(async () => {
-    const tabs = await browser.tabs.query({url: 'https://roamresearch.com/*'});
-    const tab = tabs.find(t => !t.discarded) || tabs[0];
-    if (tab?.id != null) {
-      await browser.tabs.update(tab.id, {active: true});
-      await browser.windows.update(tab.windowId, {focused: true});
-    } else {
-      await browser.tabs.create({url: 'https://roamresearch.com/', pinned: true});
-    }
+  const keeper = createTabKeeper(browser);
+  const refresh = () => { void keeper.reconcile().catch(console.warn); };
+  browser.action.onClicked.addListener(() => { void keeper.open().catch(console.warn); });
+  browser.tabs.onCreated.addListener(refresh);
+  browser.tabs.onRemoved.addListener(refresh);
+  browser.tabs.onReplaced.addListener(refresh);
+  browser.tabs.onUpdated.addListener((_id, change) => {
+    if (change.url || change.status === 'complete' || change.discarded !== undefined || change.autoDiscardable === true) refresh();
   });
+  browser.runtime.onStartup.addListener(refresh);
+  browser.runtime.onInstalled.addListener(refresh);
+  refresh();
   browser.commands.onCommand.addListener(async (action) => {
     const [tab] = await browser.tabs.query({active: true, currentWindow: true});
     if (tab?.id != null) {

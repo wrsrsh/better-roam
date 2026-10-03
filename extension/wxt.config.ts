@@ -5,6 +5,7 @@ export default defineConfig({
     description: 'A cleaner Roam: Craft theme, advanced search, quick page creation, automatic caret focus, and simpler dialogs.',
     minimum_chrome_version: '111',
     icons: {128: 'icon.png'},
+    permissions: ['storage'],
     host_permissions: ['https://roamresearch.com/*'],
     action: {default_title: 'Open Better Roam', default_icon: {128: 'icon.png'}},
     commands: {

@@ -42,6 +42,8 @@ load `extension/.output/chrome-mv3` for local builds. customize `vendor/theme/be
 
 The animated startup astrolabe is replaced with a small static loading message. This is a visual change, not a cold-start cache or a promise of faster graph loading.
 
-Roam manages graph storage and sync. closed or discarded tabs may need to load again. this is a Chrome extension only; old desktop releases remain historical.
+Better Roam keeps one Roam tab protected from Chrome’s automatic discarding. click the extension icon to return to that tab. keep it open to retain the loaded graph in RAM; closing the tab, quitting Chrome, crashes, or forced discards still require loading again. this is not a disk cache. no background graph polling.
+
+Roam manages graph storage and sync. this is a Chrome extension only; old desktop releases remain historical.
 
 unofficial. Roam's name and logo belong to Roam Research. theme derived from Alexander Rink's MIT-licensed Roam Studio; [license](vendor/theme/LICENSE).
