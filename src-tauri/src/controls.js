@@ -122,26 +122,41 @@
     };
     attempt();
   };
-  let focusedPage = null;
-  const focusEmptyPage = () => {
-    const uid = location.hash.match(/\/page\/([^/?]+)/)?.[1];
-    const page = document.querySelector('.roam-article .rm-title-display');
-    if (!uid || !page || uid === focusedPage || document.getElementById('roam-desktop-new-page')) return;
-    const blocks = document.querySelectorAll('.roam-article .roam-block');
-    if (blocks.length !== 1 || blocks[0].textContent.trim()) return;
-    if (document.activeElement?.matches?.('textarea, [contenteditable="true"]')) return;
-    focusedPage = uid;
-    focusContent(uid);
+  // Only inspect after navigation, never in response to editor DOM mutations.
+  let pageFocusTimer;
+  let navigationGeneration = 0;
+  const cancelAutoFocus = () => {
+    navigationGeneration++;
+    focusGeneration++;
+    clearTimeout(pageFocusTimer);
   };
-  if (typeof MutationObserver !== 'undefined') {
-    const observer = new MutationObserver(focusEmptyPage);
-    const observe = () => {
-      observer.observe(document.body, {childList: true, subtree: true});
-      focusEmptyPage();
+  const schedulePageFocus = () => {
+    cancelAutoFocus();
+    const generation = navigationGeneration;
+    const uid = location.hash.match(/\/page\/([^/?]+)/)?.[1];
+    if (!uid) return;
+    let attempts = 0;
+    const check = () => {
+      if (generation !== navigationGeneration) return;
+      // Check the active editor before any document traversal.
+      if (document.activeElement?.matches?.('textarea, input, [contenteditable="true"]')) return;
+      const page = document.querySelector('.roam-article .rm-title-display');
+      if (page && !document.getElementById('roam-desktop-new-page')) {
+        const blocks = document.querySelectorAll('.roam-article .roam-block');
+        if (blocks.length) {
+          if (blocks.length === 1 && !blocks[0].textContent.trim()) focusContent(uid);
+          return;
+        }
+      }
+      if (++attempts < 20) pageFocusTimer = setTimeout(check, 100);
     };
-    if (document.body) observe();
-    else document.addEventListener('DOMContentLoaded', observe, {once: true});
-  }
+    pageFocusTimer = setTimeout(check, 100);
+  };
+  window.addEventListener('hashchange', schedulePageFocus);
+  document.addEventListener('keydown', cancelAutoFocus, true);
+  document.addEventListener('pointerdown', cancelAutoFocus, true);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedulePageFocus, {once: true});
+  else schedulePageFocus();
   window.__roamDesktopAction = (action) => {
     if (action === 'new-page') { newPage(); return; }
     if (action === 'palette') { openPalette(); return; }

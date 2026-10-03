@@ -4,7 +4,8 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const code = readFileSync(new URL('../src-tauri/src/controls.js', import.meta.url), 'utf8');
 function setup({palette = false, emptyPage = false, editing = false} = {}) {
-  const events = {}, keys = [], opened = [], state = {focused:false, selected:false, settings:false, blockClicks:0};
+  const timers = new Map(); let timerId = 0;
+  const events = {}, keys = [], opened = [], state = {focused:false, selected:false, settings:false, blockClicks:0, scans:0};
   const page = {};
   const block = {textContent:"", click(){state.blockClicks++;}};
   class Element { matches() { return true; } }
@@ -15,6 +16,7 @@ function setup({palette = false, emptyPage = false, editing = false} = {}) {
     getElementById(){return null;},
     addEventListener(name, callback){events[name]=callback;},
     querySelector(selector){
+      state.scans++;
       if (selector.includes('rm-title-display')) return emptyPage ? page : null;
       if (selector.includes('Find or Create Page')) return input;
       if (selector.includes('command-palette')) return palette ? {} : null;
@@ -25,13 +27,13 @@ function setup({palette = false, emptyPage = false, editing = false} = {}) {
   const window = {roamAlphaAPI:{ui:{mainWindow:{focusFirstBlock(){state.blockClicks++;}}}},addEventListener(name,callback){events['window:'+name]=callback;},
     __TAURI__:{core:{invoke(_command,args){opened.push(args.url);return Promise.resolve();}}}};
   window.top=window;
-  vm.runInNewContext(code,{window,document,Element,URL,console,setTimeout(){},
+  vm.runInNewContext(code,{window,document,Element,URL,console,setTimeout(fn){timers.set(++timerId,fn);return timerId;},clearTimeout(id){timers.delete(id);},
     MutationObserver:class {constructor(callback){events.mutate=callback;} observe(){}},
     KeyboardEvent:class {constructor(type,args){Object.assign(this,{type},args);}},
     location:{origin:'https://roamresearch.com',href:'https://roamresearch.com/#/app/test',hash:'#/app/test/page/test-page'},
     localStorage:{getItem(){return null;},setItem(){}}
   });
-  return {window,events,keys,opened,state,Element};
+  return {window,events,keys,opened,state,Element,tick(){const pending=[...timers.values()];timers.clear();pending.forEach(fn=>fn());}};
 }
 test('external click is cancelled in Roam and sent to the system opener, including modifier clicks',()=>{
   const x=setup(); const link=new x.Element();link.href='https://example.com/article';
@@ -60,9 +62,25 @@ test('Cmd+K consumes the editor link shortcut and opens the palette',()=>{
 
 test('empty pages focus their first block once and do not steal an active editor',()=>{
   const x=setup({emptyPage:true});
+  x.tick();
   assert.equal(x.state.blockClicks,1);
-  x.events.mutate();
+  x.events.keydown();
+  x.tick();
   assert.equal(x.state.blockClicks,1);
   const editing=setup({emptyPage:true,editing:true});
+  editing.tick();
   assert.equal(editing.state.blockClicks,0);
+  assert.equal(editing.state.scans,0);
+});
+
+test('typing cancels pending autofocus without scanning the document',()=>{
+  const x=setup({emptyPage:true});
+  x.events.keydown();
+  for(let i=0;i<1000;i++) {
+    x.events['window:keydown']({key:'a',isTrusted:true,metaKey:false});
+    x.tick();
+  }
+  assert.equal(x.state.scans,0);
+  assert.equal(x.state.blockClicks,0);
+  assert.equal(x.events.mutate,undefined);
 });
