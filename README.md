@@ -12,6 +12,12 @@ it still uses memory while hidden. a reboot or full quit means loading the graph
 
 it's ad-hoc signed, not Apple-notarized. if macOS blocks it and you trust the app, use **System Settings → Privacy & Security → Open Anyway**.
 
+## defaults
+
+external links open in your default browser. `⌘,` opens settings, `⌘K` the command palette, and `⌘O` search.
+
+the Craft theme is built into the app as CSS, with automatic light/dark appearance and Feather icons. no Depot extension needed. edit `vendor/roam-desktop-theme/desktop.css` and rebuild to customize it. [theme repo](https://github.com/wrsrsh/roam-desktop-theme) · based on Alexander Rink’s MIT-licensed Roam Studio.
+
 ## dev
 
 requires Node.js, Rust, and Xcode Command Line Tools.

@@ -1,0 +1,16 @@
+/* Roam Desktop defaults. Edit this file to customize the bundled theme. */
+:root {
+  --ff-main: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ff-main__tags: var(--ff-main);
+  --ff-main__pomodoro: var(--ff-main);
+  --ff-main__quote: var(--ff-main);
+  --ff-log-page__h1: var(--ff-main);
+  --fs-app__html: 15px !important;
+}
+.roam-block, .rm-block__input {
+  line-height: calc(var(--fs-main) + 8px);
+  min-height: calc(var(--fs-main) + 16px);
+  padding-top: 4px;
+}
+#roamStudioToggleDarkMode, #roamStudioToggleDarkMode-flex-space,
+#roamStudioToggleDarkMode-flex-space-after { display: none !important; }

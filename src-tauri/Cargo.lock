@@ -2487,9 +2487,10 @@ dependencies = [
 
 [[package]]
 name = "roam-desktop"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "objc2-app-kit",
+ "serde_json",
  "tauri",
  "tauri-build",
 ]
