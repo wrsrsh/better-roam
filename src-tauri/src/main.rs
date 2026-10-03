@@ -122,7 +122,6 @@ fn main() {
             .hidden_title(true)
             .background_throttling(tauri::utils::config::BackgroundThrottlingPolicy::Disabled)
             .initialization_script(include_str!("controls.js"))
-            .initialization_script(include_str!("../../adapter/dist/browser.js"))
             .initialization_script(include_str!(concat!(env!("OUT_DIR"), "/theme.js")))
             .build()?;
             // Keep the titled NSWindow style for native corner clipping/shadow,

@@ -2,8 +2,10 @@
 
 A renderer-independent layer for a custom Roam editor. It exposes structured
 pages and blocks, isolates graph sessions, serializes writes, and makes failures
-explicit. The Tauri build injects it into the authenticated Roam webview; it does
-not read graph contents or build a search index until called.
+explicit. It is retained as a development library and is not injected into the
+shipping desktop app or Chrome extension. To experiment with the browser API
+below, build and explicitly load `adapter/dist/browser.js` in a development
+webview. It does not read graph contents or build a search index until called.
 
 The visible app is still Roam. This is the data boundary for a future interface,
 not a completed replacement editor or synchronization engine.

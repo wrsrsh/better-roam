@@ -1,5 +1,6 @@
 (() => {
   if (window.top !== window || location.origin !== 'https://roamresearch.com') return;
+  if (window.__roamDesktopAction) return;
   // Store only the graph route; graph data remains managed by Roam/WebKit.
   const routeKey = 'roam-desktop:last-graph';
   try {

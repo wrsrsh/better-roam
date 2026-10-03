@@ -2,6 +2,8 @@
   if (window.top !== window || location.origin !== 'https://roamresearch.com') return;
   const css = __THEME_CSS__;
   function install() {
+    // Repeated injection must not install duplicate styles or observers.
+    if (document.getElementById('roam-desktop-theme')) return;
     const style = document.createElement('style');
     style.id = 'roam-desktop-theme';
     style.textContent = css;
@@ -20,7 +22,14 @@
       }
     };
     update();
-    new MutationObserver(update).observe(document.head, {childList: true});
+    // Roam updates head metadata too. Only theme insertion/removal warrants a
+    // stylesheet scan; editor updates and unrelated head nodes do no work.
+    new MutationObserver(records => {
+      const relevant = records.some(record =>
+        [...record.addedNodes, ...record.removedNodes].some(node =>
+          node === style || node.matches?.('style[id^="roamstudio-"]')));
+      if (relevant) update();
+    }).observe(document.head, {childList: true});
     window.addEventListener('hashchange', update);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install, {once:true});
