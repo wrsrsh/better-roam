@@ -1,37 +1,39 @@
-# roam desktop
+# better roam
 
-a little macOS wrapper for [roam research](https://roamresearch.com). built with tauri and the Mac's own webview. no title bar or floating controls, just your graph.
+a faster, cleaner [Roam Research](https://roamresearch.com) experience in Chrome. built with [WXT](https://wxt.dev). no Roam Depot extensions needed.
 
-closing the window or pressing `⌘Q` keeps your graph running in the background and hides the Dock icon. open the app again to pick up where you left off. `⇧⌘Q` quits completely.
-
-it still uses memory while hidden. a reboot or full quit means loading the graph again. macOS 14+ keeps the background webview awake; older versions may suspend it.
+Craft light/dark theme, quick page creation with caret focus, advanced search shortcuts, simpler dialogs, and less visual clutter. no analytics or separate graph sync engine.
 
 ## install
 
-[download the DMG](https://github.com/wrsrsh/roamdesktop/releases/latest), open it, and drag Roam Desktop into Applications. Apple Silicon, macOS 12+.
+[download the extension](https://github.com/wrsrsh/betterroam/releases/latest), unzip it, then open `chrome://extensions`. enable **Developer mode**, click **Load unpacked**, and select the extracted folder. reload Roam.
 
-it's ad-hoc signed, not Apple-notarized. if macOS blocks it and you trust the app, use **System Settings → Privacy & Security → Open Anyway**.
+## shortcuts
 
-## defaults
+| action | shortcut |
+| --- | --- |
+| new page | Alt+Shift+N |
+| advanced search | Alt+Shift+O |
+| command palette | Alt+Shift+K |
+| settings | Alt+Shift+S |
 
-external links open in your default browser. `⌘,` opens settings, `⌘K` the command palette, and `⌘O` advanced search. The navbar search is hidden. `⌘N` creates a page; new empty pages focus the first block so you can start typing.
+Alt is Option on Mac. customize at `chrome://extensions/shortcuts`; Chrome reserves shortcuts like Cmd+N and Cmd+O.
 
-the Craft theme is built into the app as CSS, with automatic light/dark appearance and Feather icons. no Depot extension needed. edit `vendor/roam-desktop-theme/desktop.css` and rebuild to customize it. [theme repo](https://github.com/wrsrsh/roam-desktop-theme) · based on Alexander Rink’s MIT-licensed Roam Studio.
+## develop
 
-## dev
-
-requires Node.js, Rust, and Xcode Command Line Tools.
+requires Node.js 24+.
 
 ```sh
-npm install
+npm ci
 npm run dev
-npm run build # builds the app and DMG
+npm test
+npm run typecheck
+npm run build
+npm run zip
 ```
 
-[API adapter](adapter/README.md) · [custom interface design](docs/sync-design.md)
+load `extension/.output/chrome-mv3` for local builds. customize `vendor/theme/better-roam.css` and rebuild.
 
-unofficial. Roam Research's name and logo belong to their owner.
+Roam manages graph storage and sync. closed or discarded tabs may need to load again. this is a Chrome extension only; old desktop releases remain historical.
 
-## chrome extension
-
-[Better Roam](extension/README.md) brings the theme, page creation, advanced search, caret focus, and dialog fixes to Chrome. Built with WXT; see its README for installation and browser shortcut limitations.
+unofficial. Roam's name and logo belong to Roam Research. theme derived from Alexander Rink's MIT-licensed Roam Studio; [license](vendor/theme/LICENSE).

@@ -1,11 +1,11 @@
 import { readFile, mkdir, writeFile, copyFile } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 const repo = new URL('../', root);
-const files = ['src/RoamStudio/system/system.css', 'src/RoamStudio/common/colors.css', 'src/RoamStudio/common/fixes.css', 'src/RoamStudio/inline/craft-common.css', 'src/RoamStudio/inline/craft-auto.css', 'src/RoamStudio/modules/icons-feather.css', 'desktop.css'];
-const css = (await Promise.all(files.map(f => readFile(new URL('vendor/roam-desktop-theme/' + f, repo), 'utf8')))).join('\n').replaceAll('@charset "UTF-8";', '');
-const controls = await readFile(new URL('src-tauri/src/controls.js', repo), 'utf8');
-const theme = (await readFile(new URL('src-tauri/src/theme-template.js', repo), 'utf8')).replace('__THEME_CSS__', JSON.stringify(css));
+const files = ['src/RoamStudio/system/system.css', 'src/RoamStudio/common/colors.css', 'src/RoamStudio/common/fixes.css', 'src/RoamStudio/inline/craft-common.css', 'src/RoamStudio/inline/craft-auto.css', 'src/RoamStudio/modules/icons-feather.css', 'better-roam.css'];
+const css = (await Promise.all(files.map(f => readFile(new URL('vendor/theme/' + f, repo), 'utf8')))).join('\n').replaceAll('@charset "UTF-8";', '');
+const controls = await readFile(new URL('extension/runtime/controls.js', repo), 'utf8');
+const theme = (await readFile(new URL('extension/runtime/theme-template.js', repo), 'utf8')).replace('__THEME_CSS__', JSON.stringify(css));
 await mkdir(new URL('generated/', root), {recursive: true});
 await writeFile(new URL('generated/shared.js', root), `export function install() {\n${theme}\n${controls}\n}\n`);
 await copyFile(new URL('assets/roam-logo.png', repo), new URL('public/icon.png', root));
-await copyFile(new URL('vendor/roam-desktop-theme/LICENSE', repo), new URL('public/THEME-LICENSE.txt', root));
+await copyFile(new URL('vendor/theme/LICENSE', repo), new URL('public/THEME-LICENSE.txt', root));

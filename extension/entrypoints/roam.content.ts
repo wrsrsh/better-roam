@@ -10,7 +10,7 @@ export default defineContentScript({
     document.addEventListener('better-roam-command', (event) => {
       const action = (event as CustomEvent).detail;
       if (['new-page', 'search', 'palette', 'settings'].includes(action)) {
-        (window as any).__roamDesktopAction?.(action);
+        (window as any).__betterRoamAction?.(action);
       }
     });
   },

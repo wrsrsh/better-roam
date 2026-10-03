@@ -3,9 +3,9 @@
   const css = __THEME_CSS__;
   function install() {
     // Repeated injection must not install duplicate styles or observers.
-    if (document.getElementById('roam-desktop-theme')) return;
+    if (document.getElementById('better-roam-theme')) return;
     const style = document.createElement('style');
-    style.id = 'roam-desktop-theme';
+    style.id = 'better-roam-theme';
     style.textContent = css;
     const update = () => {
       const enabled = location.hash.startsWith('#/app/');

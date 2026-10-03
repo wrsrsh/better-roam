@@ -1,8 +1,8 @@
 (() => {
   if (window.top !== window || location.origin !== 'https://roamresearch.com') return;
-  if (window.__roamDesktopAction) return;
-  // Store only the graph route; graph data remains managed by Roam/WebKit.
-  const routeKey = 'roam-desktop:last-graph';
+  if (window.__betterRoamAction) return;
+  // Store only the graph route; graph data remains managed by Roam/Chrome.
+  const routeKey = 'better-roam:last-graph';
   try {
     const saved = localStorage.getItem(routeKey);
     if ((location.hash === '' || location.hash === '#/' || location.hash === '#') && saved?.startsWith('#/app/')) {
@@ -19,7 +19,6 @@
   window.addEventListener('pagehide', rememberGraph);
 
   const openExternal = (url) => {
-    if (window.__TAURI__) return window.__TAURI__.core.invoke('open_external', { url });
     window.open(url, '_blank', 'noopener,noreferrer');
     return Promise.resolve();
   };
@@ -56,19 +55,19 @@
   // Settings/search use a palette command internally. Keep that intermediate
   // palette invisible so opening one dialog does not visibly open two.
   const openDialogCommand = () => {
-    document.documentElement?.setAttribute('data-roam-desktop-dialog-command', '');
+    document.documentElement?.setAttribute('data-better-roam-dialog-command', '');
     openPalette();
   };
   const finishDialogCommand = () => {
-    document.documentElement?.removeAttribute('data-roam-desktop-dialog-command');
+    document.documentElement?.removeAttribute('data-better-roam-dialog-command');
   };
   // A title prompt keeps page creation explicit; Roam remains the data owner.
   const newPage = () => {
-    if (document.getElementById('roam-desktop-new-page')) return;
+    if (document.getElementById('better-roam-new-page')) return;
     const dialog = document.createElement('dialog');
-    dialog.id = 'roam-desktop-new-page';
-    dialog.setAttribute('aria-labelledby', 'roam-desktop-new-page-title');
-    dialog.innerHTML = '<form><h2 id="roam-desktop-new-page-title">New page</h2><label for="roam-desktop-page-title">Page title</label><input id="roam-desktop-page-title" name="title" placeholder="Give your page a name" required autocomplete="off"><p role="status"></p><footer><button type="button">Cancel</button><button type="submit">Create page <span aria-hidden="true">↵</span></button></footer></form>';
+    dialog.id = 'better-roam-new-page';
+    dialog.setAttribute('aria-labelledby', 'better-roam-new-page-title');
+    dialog.innerHTML = '<form><h2 id="better-roam-new-page-title">New page</h2><label for="better-roam-page-title">Page title</label><input id="better-roam-page-title" name="title" placeholder="Give your page a name" required autocomplete="off"><p role="status"></p><footer><button type="button">Cancel</button><button type="submit">Create page <span aria-hidden="true">↵</span></button></footer></form>';
     const close = () => dialog.remove();
     dialog.addEventListener('cancel', close);
     dialog.querySelector('button[type="button"]').onclick = close;
@@ -142,7 +141,7 @@
       // Check the active editor before any document traversal.
       if (document.activeElement?.matches?.('textarea, input, [contenteditable="true"]')) return;
       const page = document.querySelector('.roam-article .rm-title-display');
-      if (page && !document.getElementById('roam-desktop-new-page')) {
+      if (page && !document.getElementById('better-roam-new-page')) {
         const blocks = document.querySelectorAll('.roam-article .roam-block');
         if (blocks.length) {
           if (blocks.length === 1 && !blocks[0].textContent.trim()) focusContent(uid);
@@ -158,7 +157,7 @@
   document.addEventListener('pointerdown', cancelAutoFocus, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedulePageFocus, {once: true});
   else schedulePageFocus();
-  window.__roamDesktopAction = (action) => {
+  window.__betterRoamAction = (action) => {
     if (action === 'new-page') { newPage(); return; }
     if (action === 'palette') { openPalette(); return; }
     if (action === 'search') {
@@ -203,6 +202,6 @@
     if (!action) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    window.__roamDesktopAction(action);
+    window.__betterRoamAction(action);
   }, true);
 })();

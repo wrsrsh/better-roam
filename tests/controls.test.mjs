@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
-const code = readFileSync(new URL('../src-tauri/src/controls.js', import.meta.url), 'utf8');
+const code = readFileSync(new URL('../extension/runtime/controls.js', import.meta.url), 'utf8');
 function setup({palette = false, emptyPage = false, editing = false} = {}) {
   const timers = new Map(); let timerId = 0;
   const events = {}, keys = [], opened = [], state = {focused:false, selected:false, settings:false, blockClicks:0, scans:0};
@@ -25,7 +25,7 @@ function setup({palette = false, emptyPage = false, editing = false} = {}) {
     querySelectorAll(selector){if(selector.includes('roam-block')) return emptyPage ? [block] : [];return [{textContent:'Open settings',click(){state.settings=true;}},{textContent:'Open advanced search',click(){state.search=true;}}];}
   };
   const window = {roamAlphaAPI:{ui:{mainWindow:{focusFirstBlock(){state.blockClicks++;}}}},addEventListener(name,callback){events['window:'+name]=callback;},
-    __TAURI__:{core:{invoke(_command,args){opened.push(args.url);return Promise.resolve();}}}};
+    open(url){opened.push(url);}};
   window.top=window;
   vm.runInNewContext(code,{window,document,Element,URL,console,setTimeout(fn){timers.set(++timerId,fn);return timerId;},clearTimeout(id){timers.delete(id);},
     MutationObserver:class {constructor(callback){events.mutate=callback;} observe(){}},
@@ -35,7 +35,7 @@ function setup({palette = false, emptyPage = false, editing = false} = {}) {
   });
   return {window,events,keys,opened,state,Element,tick(){const pending=[...timers.values()];timers.clear();pending.forEach(fn=>fn());}};
 }
-test('external click is cancelled in Roam and sent to the system opener, including modifier clicks',()=>{
+test('external click is cancelled in Roam and opened in a separate tab, including modifier clicks',()=>{
   const x=setup(); const link=new x.Element();link.href='https://example.com/article';
   let cancelled=false;
   x.events.click({composedPath:()=>[link],metaKey:true,preventDefault(){cancelled=true;},stopImmediatePropagation(){}});
@@ -47,11 +47,11 @@ test('internal graph links are left to Roam',()=>{
   assert.deepEqual(x.opened,[]);
 });
 test('settings reuses an open palette and activates the settings command',()=>{
-  const x=setup({palette:true});x.window.__roamDesktopAction('settings');
+  const x=setup({palette:true});x.window.__betterRoamAction('settings');
   assert.equal(x.state.settings,true);assert.deepEqual(x.keys,[]);
 });
 test('search invokes advanced search instead of the navbar input',()=>{
-  const x=setup();x.window.__roamDesktopAction('search');
+  const x=setup();x.window.__betterRoamAction('search');
   assert.equal(x.state.search,true);assert.equal(x.state.focused,false);
 });
 test('Cmd+K consumes the editor link shortcut and opens the palette',()=>{

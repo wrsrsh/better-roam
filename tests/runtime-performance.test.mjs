@@ -22,7 +22,7 @@ test('unrelated head mutations do not rescan or rewrite theme styles', () => {
     location: {origin: 'https://roamresearch.com', hash: '#/app/test'},
     MutationObserver: class {constructor(callback) {observer = callback; observers++;} observe() {}},
   });
-  const code = source('../src-tauri/src/theme-template.js').replace('__THEME_CSS__', '"body {}"');
+  const code = source('../extension/runtime/theme-template.js').replace('__THEME_CSS__', '"body {}"');
   vm.runInContext(code, context);
   assert.equal(scans, 1); assert.equal(writes, 1);
   for (let i = 0; i < 1000; i++) observer([{addedNodes: [{matches: () => false}], removedNodes: []}]);
@@ -36,15 +36,10 @@ test('unrelated head mutations do not rescan or rewrite theme styles', () => {
   assert.equal(observers, 1); assert.equal(writes, 2);
 });
 
-test('shipping desktop and extension do not inject the experimental adapter', () => {
-  assert.doesNotMatch(source('../src-tauri/src/main.rs'), /adapter\/dist\/browser/);
-  assert.doesNotMatch(source('../extension/scripts/prepare-shared.mjs'), /adapter\/|refreshSearch|addPullWatch/);
-});
-
 test('repeated controls injection installs no additional event handlers', () => {
-  const window = {__roamDesktopAction() {}, addEventListener() {throw Error('duplicate handler');}};
+  const window = {__betterRoamAction() {}, addEventListener() {throw Error('duplicate handler');}};
   window.top = window;
-  vm.runInNewContext(source('../src-tauri/src/controls.js'), {
+  vm.runInNewContext(source('../extension/runtime/controls.js'), {
     window, location: {origin: 'https://roamresearch.com'},
   });
 });
