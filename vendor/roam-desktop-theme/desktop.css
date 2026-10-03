@@ -14,3 +14,66 @@
 }
 #roamStudioToggleDarkMode, #roamStudioToggleDarkMode-flex-space,
 #roamStudioToggleDarkMode-flex-space-after { display: none !important; }
+
+/* Native page prompt shares Craft's light/dark dialog and control tokens. */
+#roam-desktop-new-page {
+  box-sizing: border-box;
+  width: min(420px, calc(100vw - 40px));
+  padding: 24px;
+  background: var(--bc-dialog);
+  color: var(--co-dialog);
+  border: var(--bt-dialog);
+  border-radius: var(--bd-dialog);
+  box-shadow: var(--sd-dialog);
+  font: 14px/1.5 var(--ff-main);
+}
+#roam-desktop-new-page::backdrop { background: rgb(0 0 0 / 24%); }
+#roam-desktop-new-page h2 { margin: 0 0 20px; font: 600 18px/1.3 var(--ff-main); color: var(--co-dialog__heading); }
+#roam-desktop-new-page label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--co-dialog__span); }
+#roam-desktop-new-page input {
+  box-sizing: border-box; width: 100%; padding: 10px 12px;
+  font: inherit; background: var(--bc-allpages__input); color: var(--co-allpages__input);
+  border: var(--bt-allpages__input); border-radius: var(--bd-allpages__input);
+  box-shadow: none;
+}
+#roam-desktop-new-page input:focus { outline: none; border: var(--bt-allpages__input--focus); background: var(--bc-allpages__input--focus); box-shadow: 0 0 0 2px var(--cl-gray-200); }
+#roam-desktop-new-page input::placeholder { color: var(--co-dialog__span); }
+#roam-desktop-new-page [role="status"] { margin: 8px 0 0; font-size: 12px; color: var(--co-dialog__span); }
+#roam-desktop-new-page [role="status"]:empty { display: none; }
+#roam-desktop-new-page footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px; }
+#roam-desktop-new-page button {
+  font: 500 13px/1.4 var(--ff-main); padding: 7px 12px; cursor: pointer;
+  border: 1px solid transparent; border-radius: var(--bd-button__primary);
+  background: var(--bc-button__cancel); color: var(--co-button__cancel);
+}
+#roam-desktop-new-page button[type="submit"] { background: var(--bc-button__primary); border: var(--bt-button__primary); color: var(--co-button__primary); }
+#roam-desktop-new-page button:hover { background: var(--cl-gray-200); }
+#roam-desktop-new-page button:focus-visible { outline: 2px solid var(--cl-gray-500); outline-offset: 2px; }
+#roam-desktop-new-page button span { margin-left: 10px; opacity: .5; }
+
+/* Keep search in the advanced dialog, out of the navigation bar. */
+.rm-topbar .rm-find-or-create-wrapper { display: none !important; }
+
+/* Dialogs fade in place: no zoom, slide, or animated layout changes. */
+.bp3-dialog, .bp3-overlay-backdrop, .rm-command-palette,
+.rm-find-or-create-modal, .rm-settings {
+  transition-property: opacity !important;
+  transition-duration: 100ms !important;
+  transition-timing-function: ease-out !important;
+  animation: none !important;
+}
+.bp3-dialog { transform: none !important; }
+.rm-topbar { transition: none !important; }
+:root[data-roam-desktop-dialog-command] .rm-command-palette {
+  visibility: hidden !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bp3-dialog, .bp3-overlay-backdrop, .rm-command-palette,
+  .rm-find-or-create-modal, .rm-settings { transition: none !important; }
+}
+
+/* Self-contained defaults: no Depot module installation required. */
+#roam-sidebar-logo { display: none !important; }
+:root { --bb-topbar: none; --bb-left-sidebar__toprow: none; --bb-right-sidebar__toprow: none; }
+.rm-topbar { border-bottom: none !important; box-shadow: none !important; }

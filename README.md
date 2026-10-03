@@ -14,7 +14,7 @@ it's ad-hoc signed, not Apple-notarized. if macOS blocks it and you trust the ap
 
 ## defaults
 
-external links open in your default browser. `⌘,` opens settings, `⌘K` the command palette, and `⌘O` search.
+external links open in your default browser. `⌘,` opens settings, `⌘K` the command palette, and `⌘O` advanced search. The navbar search is hidden. `⌘N` creates a page; new empty pages focus the first block so you can start typing.
 
 the Craft theme is built into the app as CSS, with automatic light/dark appearance and Feather icons. no Depot extension needed. edit `vendor/roam-desktop-theme/desktop.css` and rebuild to customize it. [theme repo](https://github.com/wrsrsh/roam-desktop-theme) · based on Alexander Rink’s MIT-licensed Roam Studio.
 
@@ -31,3 +31,7 @@ npm run build # builds the app and DMG
 [API adapter](adapter/README.md) · [custom interface design](docs/sync-design.md)
 
 unofficial. Roam Research's name and logo belong to their owner.
+
+## chrome extension
+
+[Better Roam](extension/README.md) brings the theme, page creation, advanced search, caret focus, and dialog fixes to Chrome. Built with WXT; see its README for installation and browser shortcut limitations.

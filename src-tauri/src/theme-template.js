@@ -7,12 +7,17 @@
     style.textContent = css;
     const update = () => {
       const enabled = location.hash.startsWith('#/app/');
-      style.disabled = !enabled;
-      if (enabled) {
-        // Suppress the Depot copy only in this webview, without changing the graph.
-        document.head.querySelectorAll('style[id^="roamstudio-"]').forEach(node => { if (node.sheet) node.sheet.disabled = true; });
-      }
+      if (style.disabled === enabled) style.disabled = !enabled;
       if (!style.isConnected) document.head.appendChild(style);
+      if (enabled) {
+        // Keep the bundled theme, but honor these Depot appearance modules.
+        document.head.querySelectorAll('style[id^="roamstudio-"]').forEach(node => {
+          const allowed = ['roamstudio-css-hide-logo', 'roamstudio-css-topbar-borders'].includes(node.id);
+          if (node.sheet && node.sheet.disabled === allowed) node.sheet.disabled = !allowed;
+          // Module variables must follow the bundled theme in the cascade.
+          if (allowed && (node.compareDocumentPosition(style) & 4)) document.head.appendChild(node);
+        });
+      }
     };
     update();
     new MutationObserver(update).observe(document.head, {childList: true});

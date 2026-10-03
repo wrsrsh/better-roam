@@ -10,3 +10,8 @@ src-tauri/gen/
 release/
 
 adapter/dist/
+extension/.wxt/
+extension/.output/
+extension/generated/
+extension/public/icon.png
+extension/public/THEME-LICENSE.txt

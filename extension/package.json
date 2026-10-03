@@ -1,0 +1,18 @@
+{
+  "name": "better-roam",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare:shared": "node scripts/prepare-shared.mjs",
+    "dev": "npm run prepare:shared && wxt",
+    "build": "npm run prepare:shared && wxt build",
+    "zip": "npm run prepare:shared && wxt zip",
+    "typecheck": "npm run prepare:shared && wxt prepare && tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.0",
+    "wxt": "^0.21.4"
+  }
+}

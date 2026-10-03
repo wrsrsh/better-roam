@@ -63,13 +63,15 @@ fn main() {
                 MenuItem::with_id(app, "settings", "Settings…", true, Some("CmdOrCtrl+,"))?;
             let palette =
                 MenuItem::with_id(app, "palette", "Command Palette", true, Some("CmdOrCtrl+K"))?;
-            let search = MenuItem::with_id(app, "search", "Search", true, Some("CmdOrCtrl+O"))?;
+            let search = MenuItem::with_id(app, "search", "Advanced Search", true, Some("CmdOrCtrl+O"))?;
+            let new_page = MenuItem::with_id(app, "new-page", "New Page…", true, Some("CmdOrCtrl+N"))?;
             let reload = MenuItem::with_id(app, "reload", "Reload", true, Some("CmdOrCtrl+R"))?;
             let app_menu = Submenu::with_items(
                 app,
                 "Roam Desktop",
                 true,
                 &[
+                    &new_page,
                     &settings,
                     &show,
                     &hide,
@@ -149,7 +151,7 @@ fn main() {
             Ok(())
         })
         .on_menu_event(|app, event| match event.id().as_ref() {
-            "settings" | "palette" | "search" => {
+            "settings" | "palette" | "search" | "new-page" => {
                 if let Some(window) = app.get_webview_window("main") {
                     // IDs are fixed native menu values, never page-provided code.
                     let _ = window.eval(format!(
