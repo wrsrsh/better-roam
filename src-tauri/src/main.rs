@@ -7,7 +7,7 @@ fn hide_to_background(app: tauri::AppHandle) -> Result<(), String> {
         window.hide().map_err(|error| error.to_string())?;
     }
     #[cfg(target_os = "macos")]
-    app.set_activation_policy(tauri::ActivationPolicy::Accessory)
+    app.set_activation_policy(tauri::ActivationPolicy::Prohibited)
         .map_err(|error| error.to_string())?;
     Ok(())
 }

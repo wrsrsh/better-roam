@@ -1,6 +1,6 @@
 # roam desktop
 
-a little macOS wrapper for [roam research](https://roamresearch.com). built with tauri and the Mac's own webview. no title bar, just your graph and a `⋯` menu.
+a little macOS wrapper for [roam research](https://roamresearch.com). built with tauri and the Mac's own webview. no title bar or floating controls, just your graph.
 
 closing the window or pressing `⌘Q` keeps your graph running in the background and hides the Dock icon. open the app again to pick up where you left off. `⇧⌘Q` quits completely.
 
