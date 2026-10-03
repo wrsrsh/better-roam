@@ -39,17 +39,17 @@ const literal = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 export function advancedQuery(spec) {
   const inputs = [], values = [], clauses = [];
   const bind = value => {const name = `?arg${inputs.length}`; inputs.push(name); values.push(value); return name;};
-  // A page's containing page is itself; a block's is its :block/page.
-  clauses.push(`(or-join [?e ?text ?kind ?page]
-    (and [?e :node/title ?text] [(ground "page") ?kind] [(identity ?e) ?page])
-    (and [?e :block/string ?text] [?e :block/page ?page] [(ground "block") ?kind]))`);
-  clauses.push('[?e :block/uid ?uid]', '[?page :node/title ?pageTitle]');
-  if (spec.type) clauses.push(`[(= ?kind ${bind(spec.type)})]`);
-  if (spec.page) clauses.push(`[(= ?pageTitle ${bind(spec.page)})]`);
+  // Narrow indexed page/reference relations before inspecting block strings.
+  if (spec.page) clauses.push(`[?page :node/title ${bind(spec.page)}]`);
   for (const title of spec.refs) {
     const ref = `?ref${inputs.length}`;
     clauses.push(`[${ref} :node/title ${bind(title)}]`, `[?e :block/refs ${ref}]`);
   }
+  const page = '(and [?e :node/title ?text] [(ground "page") ?kind] [(identity ?e) ?page])';
+  const block = '(and [?e :block/string ?text] [?e :block/page ?page] [(ground "block") ?kind])';
+  clauses.push(spec.type === 'page' ? page.slice(5, -1) : spec.type === 'block' ? block.slice(5, -1)
+    : `(or-join [?e ?text ?kind ?page] ${page} ${block})`);
+  clauses.push('[?e :block/uid ?uid]', '[?page :node/title ?pageTitle]');
   for (const [text, exclude] of [...spec.terms.map(t => [t, false]), ...spec.exclude.map(t => [t, true])]) {
     const regex = `?re${inputs.length}`, value = bind(`(?i)${literal(text)}`);
     clauses.push(`[(re-pattern ${value}) ${regex}]`);
