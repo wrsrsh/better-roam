@@ -40,6 +40,8 @@ npm run zip
 
 load `extension/.output/chrome-mv3` for local builds. customize `vendor/theme/better-roam.css` and rebuild.
 
+The animated startup astrolabe is replaced with a small static loading message. This is a visual change, not a cold-start cache or a promise of faster graph loading.
+
 Roam manages graph storage and sync. closed or discarded tabs may need to load again. this is a Chrome extension only; old desktop releases remain historical.
 
 unofficial. Roam's name and logo belong to Roam Research. theme derived from Alexander Rink's MIT-licensed Roam Studio; [license](vendor/theme/LICENSE).

@@ -1,3 +1,4 @@
+import '../runtime/loading.css';
 import { defineContentScript } from 'wxt/utils/define-content-script';
 // @ts-ignore Generated from the desktop sources before every build.
 import {installPalette} from '../runtime/palette.js';
