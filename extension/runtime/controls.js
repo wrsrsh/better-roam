@@ -37,7 +37,10 @@
   document.addEventListener('auxclick', followLink, true);
 
   const sendKey = (key, code, keyCode) => {
-    const target = document.activeElement || document.body;
+    const root = document.querySelector('.roam-body');
+    const active = document.activeElement;
+    // React delegates shortcuts inside Roam's root, not on document.body.
+    const target = root && !root.contains(active) ? root : active || document.body;
     for (const type of ['keydown', 'keypress', 'keyup']) {
       const event = new KeyboardEvent(type, {
         key, code, metaKey: true, bubbles: true, cancelable: true

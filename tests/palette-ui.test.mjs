@@ -77,3 +77,11 @@ test('new page creates exactly one empty block then opens the page', async () =>
   assert.equal(x.calls[2][1].page.uid,'uid-1');
   x.dom.window.close();
 });
+test('native actions dispatch inside Roam when focus is outside its React root', () => {
+  const x=fixture();const root=x.w.document.createElement('div');root.className='roam-body';x.w.document.body.append(root);
+  const keys=[];root.addEventListener('keydown',event=>keys.push(event.key));
+  delete x.w.__betterRoamAction;
+  x.w.eval(readFileSync(new URL('../extension/runtime/controls.js',import.meta.url),'utf8'));
+  x.w.__betterRoamAction('roam-palette');
+  assert.deepEqual(keys,['p']);x.dom.window.close();
+});
