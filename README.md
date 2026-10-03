@@ -28,4 +28,6 @@ npm run dev
 npm run build # builds the app and DMG
 ```
 
+[API adapter](adapter/README.md) · [custom interface design](docs/sync-design.md)
+
 unofficial. Roam Research's name and logo belong to their owner.

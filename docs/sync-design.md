@@ -1,7 +1,9 @@
 # Custom UI and synchronization
 
-Design decision, not a shipped sync engine. The current app still renders Roam's
-own interface and leaves graph persistence to Roam.
+The current app still renders Roam's own interface and leaves graph persistence
+to Roam. A typed API adapter is implemented in `adapter/`; its capabilities and
+limits are documented in [the adapter guide](../adapter/README.md). The custom
+editor, disk cache, and optimistic view model remain future work.
 
 ## Applying Zero's model
 
@@ -83,3 +85,19 @@ private wire protocol. Use the supported frontend API inside the existing
 authenticated client. A standalone client is a separate project; the official
 [backend SDKs](https://github.com/Roam-Research/backend-sdks) are another integration
 option, not a replacement for the frontend client's synchronization guarantees.
+
+## Interface direction
+
+No tabs. One primary editor with one optional secondary pane. Use Bear as a
+reference for inline Markdown and text focus; use [Linear's redesign](https://linear.app/now/how-we-redesigned-the-linear-ui)
+for clear hierarchy, consistent alignment, quiet surfaces, and light/dark contrast.
+Keep navigation visually distinct from writing without adding a toolbar of rarely
+used actions. New-page creation and search are first-class keyboard actions.
+
+The adapter is independent of the visible renderer. A Swift/AppKit shell with a
+TextKit editor is the native option to evaluate against a lean web editor. Keep
+Roam in a background WKWebView initially, or later use its official local API via
+roam-tools if requiring the official Roam desktop app is acceptable. Neither choice
+eliminates Roam's cold graph loading or guarantees faster synchronization. Compare
+input latency, long-page scrolling, initial search indexing and memory on the same
+graph before selecting a renderer. Do not infer performance from “native” alone.

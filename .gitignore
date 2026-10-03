@@ -8,3 +8,5 @@ src-tauri/gen/
 *.p8
 *.key
 release/
+
+adapter/dist/

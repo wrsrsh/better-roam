@@ -4,7 +4,9 @@
   "version": "0.2.0",
   "identifier": "com.waris.roamdesktop",
   "build": {
-    "frontendDist": "../web"
+    "frontendDist": "../web",
+    "beforeBuildCommand": "npm run build:adapter",
+    "beforeDevCommand": "npm run build:adapter"
   },
   "app": {
     "withGlobalTauri": true,
