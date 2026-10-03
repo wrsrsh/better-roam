@@ -7,5 +7,6 @@ const controls = await readFile(new URL('extension/runtime/controls.js', repo), 
 const theme = (await readFile(new URL('extension/runtime/theme-template.js', repo), 'utf8')).replace('__THEME_CSS__', JSON.stringify(css));
 await mkdir(new URL('generated/', root), {recursive: true});
 await writeFile(new URL('generated/shared.js', root), `export function install() {\n${theme}\n${controls}\n}\n`);
+await mkdir(new URL('public/', root), {recursive: true});
 await copyFile(new URL('assets/roam-logo.png', repo), new URL('public/icon.png', root));
 await copyFile(new URL('vendor/theme/LICENSE', repo), new URL('public/THEME-LICENSE.txt', root));

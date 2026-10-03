@@ -10,7 +10,7 @@ export default defineConfig({
     commands: {
       'new-page': {suggested_key: {default: 'Alt+Shift+N'}, description: 'Create a Roam page'},
       search: {suggested_key: {default: 'Alt+Shift+O'}, description: 'Open advanced search'},
-      palette: {suggested_key: {default: 'Alt+Shift+K'}, description: 'Open command palette'},
+      palette: {suggested_key: {default: 'Ctrl+K', mac: 'Command+K'}, description: 'Open command palette'},
       settings: {suggested_key: {default: 'Alt+Shift+S'}, description: 'Open settings'},
     },
   },

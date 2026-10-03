@@ -24,7 +24,7 @@ function setup({palette = false, emptyPage = false, editing = false} = {}) {
     },
     querySelectorAll(selector){if(selector.includes('roam-block')) return emptyPage ? [block] : [];return [{textContent:'Open settings',click(){state.settings=true;}},{textContent:'Open advanced search',click(){state.search=true;}}];}
   };
-  const window = {roamAlphaAPI:{ui:{mainWindow:{focusFirstBlock(){state.blockClicks++;}}}},addEventListener(name,callback){events['window:'+name]=callback;},
+  const window = {__betterRoamPalette(){state.palette=true;},roamAlphaAPI:{ui:{mainWindow:{focusFirstBlock(){state.blockClicks++;}}}},addEventListener(name,callback){events['window:'+name]=callback;},
     open(url){opened.push(url);}};
   window.top=window;
   vm.runInNewContext(code,{window,document,Element,URL,console,setTimeout(fn){timers.set(++timerId,fn);return timerId;},clearTimeout(id){timers.delete(id);},
@@ -57,7 +57,7 @@ test('search invokes advanced search instead of the navbar input',()=>{
 test('Cmd+K consumes the editor link shortcut and opens the palette',()=>{
   const x=setup();let cancelled=false;
   x.events['window:keydown']({key:'k',metaKey:true,isTrusted:true,preventDefault(){cancelled=true;},stopImmediatePropagation(){}});
-  assert.equal(cancelled,true);assert.deepEqual(x.keys,['p','p','p']);
+  assert.equal(cancelled,true);assert.equal(x.state.palette,true);assert.deepEqual(x.keys,[]);
 });
 
 test('empty pages focus their first block once and do not steal an active editor',()=>{

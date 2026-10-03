@@ -61,6 +61,31 @@
   const finishDialogCommand = () => {
     document.documentElement?.removeAttribute('data-better-roam-dialog-command');
   };
+  const createPage = async title => {
+    title = title.trim();
+    if (!title) throw new Error('A page title is required.');
+    const api = window.roamAlphaAPI;
+    const graph = location.hash.split('/').slice(0, 3).join('/');
+    const checkGraph = () => {
+      if (window.roamAlphaAPI !== api || location.hash.split('/').slice(0, 3).join('/') !== graph)
+        throw new Error('Graph changed.');
+    };
+    const owner = api?.data?.async?.pull ? api.data.async : api?.data?.pull ? api.data : api;
+    if (!owner?.pull || !api?.util || !api?.ui?.mainWindow) throw new Error('Graph not ready.');
+    const existing = await owner.pull('[:block/uid]', [':node/title', title]);
+    checkGraph();
+    const existingUid = existing?.[':block/uid'] || existing?.uid;
+    if (existingUid) {await api.ui.mainWindow.openPage({page: {uid: existingUid}}); return;}
+    const uid = api.util.generateUID();
+    const create = api.data?.page?.create || api.createPage;
+    await create.call(api.data?.page || api, {page: {title, uid}});
+    checkGraph();
+    const createBlock = api.data?.block?.create || api.createBlock;
+    await createBlock.call(api.data?.block || api, {location: {'parent-uid': uid, order: 0}, block: {uid: api.util.generateUID(), string: ''}});
+    checkGraph();
+    await api.ui.mainWindow.openPage({page: {uid}});
+    focusContent(uid);
+  };
   // A title prompt keeps page creation explicit; Roam remains the data owner.
   const newPage = () => {
     if (document.getElementById('better-roam-new-page')) return;
@@ -84,14 +109,8 @@
       }
       busy = true;
       try {
-        const uid = api.util.generateUID();
-        const create = api.data?.page?.create || api.createPage;
-        await create.call(api.data?.page || api, {page: {title, uid}});
-        const createBlock = api.data?.block?.create || api.createBlock;
-        await createBlock.call(api.data?.block || api, {location: {'parent-uid': uid, order: 0}, block: {uid: api.util.generateUID(), string: ''}});
-        await api.ui.mainWindow.openPage({page: {uid}});
+        await createPage(title);
         close();
-        focusContent(uid);
       } catch (error) {
         dialog.querySelector('[role="status"]').textContent = 'Could not create this page. Check whether the title already exists before trying again.';
       } finally { busy = false; }
@@ -117,7 +136,7 @@
       arrived = true;
       const editor = document.querySelector('.roam-article textarea.rm-block-input, .roam-article textarea.rm-block__input');
       if (editor) { editor.focus(); return; }
-      try { window.roamAlphaAPI?.ui?.mainWindow?.focusFirstBlock(); } catch (_) {}
+      try { Promise.resolve(window.roamAlphaAPI?.ui?.mainWindow?.focusFirstBlock()).catch(() => {}); } catch (_) {}
       if (++attempts < 40) setTimeout(attempt, 75);
     };
     attempt();
@@ -157,9 +176,11 @@
   document.addEventListener('pointerdown', cancelAutoFocus, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedulePageFocus, {once: true});
   else schedulePageFocus();
-  window.__betterRoamAction = (action) => {
+  window.__betterRoamAction = (action, value) => {
+    if (action === 'create-page') return createPage(value);
+    if (action === 'roam-palette') { openPalette(); return; }
     if (action === 'new-page') { newPage(); return; }
-    if (action === 'palette') { openPalette(); return; }
+    if (action === 'palette') { window.__betterRoamPalette?.(); return; }
     if (action === 'search') {
       const existing = document.querySelector('#rm-find-or-create-modal-input');
       if (existing) { existing.focus(); existing.select(); return; }

@@ -77,3 +77,29 @@
 #roam-sidebar-logo { display: none !important; }
 :root { --bb-topbar: none; --bb-left-sidebar__toprow: none; --bb-right-sidebar__toprow: none; }
 .rm-topbar { border-bottom: none !important; box-shadow: none !important; }
+
+/* Unified command palette: bounded results, no animated layout or blur. */
+#better-roam-palette {
+  box-sizing: border-box; width: min(520px, calc(100vw - 32px));
+  max-height: min(480px, 80vh); margin: 14vh auto auto; padding: 0;
+  background: var(--bc-dialog, #fff); color: var(--co-dialog, #292929);
+  border: 1px solid var(--cl-gray-200, #ddd); border-radius: 8px;
+  box-shadow: 0 8px 28px #0002; font: 13px/1.4 var(--ff-main);
+  overflow: hidden;
+}
+#better-roam-palette::backdrop { background: #0002; }
+#better-roam-palette .br-palette-search { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--cl-gray-200, #ddd); }
+#better-roam-palette input { flex: 1; min-width: 0; font: 14px/1.4 var(--ff-main); color: inherit; background: transparent; border: 0; outline: 0; box-shadow: none; }
+#better-roam-palette input::placeholder { color: inherit; opacity: .45; }
+#better-roam-palette button { font: inherit; color: inherit; background: transparent; border: 0; border-radius: 5px; padding: 4px 9px; cursor: pointer; }
+#better-roam-palette button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+#br-palette-results { max-height: min(300px, 45vh); overflow-y: auto; overscroll-behavior: contain; padding: 6px; }
+#better-roam-palette .br-result { display: flex; gap: 12px; align-items: center; padding: 7px 9px; border-radius: 4px; cursor: pointer; }
+#better-roam-palette .br-result[aria-selected="true"], #better-roam-palette .br-result:hover { background: var(--cl-gray-200, #eee); }
+#better-roam-palette .br-result-icon { width: 20px; text-align: center; opacity: .55; font-size: 14px; flex-shrink: 0; }
+#better-roam-palette .br-result-body { display: flex; align-items: baseline; gap: 12px; flex: 1; min-width: 0; }
+#better-roam-palette .br-result-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#better-roam-palette .br-result-detail { max-width: 140px; font-size: 11px; opacity: .55; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#better-roam-palette .br-status { font-size: 11px; opacity: .6; padding: 3px 14px; }
+
+#better-roam-palette .br-status:empty, #better-roam-palette .br-result-detail:empty { display: none; }
