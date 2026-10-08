@@ -9,3 +9,7 @@ each build; do not edit `generated/`.
 Access is limited to `https://roamresearch.com/*`. External links open in new tabs.
 No analytics, graph exports, custom IndexedDB cache, or separate sync engine.
 Reload Roam after updating, disabling, or uninstalling the extension.
+
+The background service worker only handles toolbar clicks and keyboard shortcuts.
+It does not run startup jobs, poll graphs, intercept navigation, or retain tabs.
+Roam's native loading screen and animation are unchanged.

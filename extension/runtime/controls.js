@@ -1,23 +1,6 @@
 (() => {
   if (window.top !== window || location.origin !== 'https://roamresearch.com') return;
   if (window.__betterRoamAction) return;
-  // Store only the graph route; graph data remains managed by Roam/Chrome.
-  const routeKey = 'better-roam:last-graph';
-  try {
-    const saved = localStorage.getItem(routeKey);
-    if ((location.hash === '' || location.hash === '#/' || location.hash === '#') && saved?.startsWith('#/app/')) {
-      location.replace('/' + saved);
-    }
-  } catch (_) {}
-  const rememberGraph = () => {
-    if (location.hash.startsWith('#/app/')) {
-      try { localStorage.setItem(routeKey, location.hash); } catch (_) {}
-    }
-  };
-  rememberGraph();
-  window.addEventListener('hashchange', rememberGraph);
-  window.addEventListener('pagehide', rememberGraph);
-
   const openExternal = (url) => {
     window.open(url, '_blank', 'noopener,noreferrer');
     return Promise.resolve();
