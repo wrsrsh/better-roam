@@ -12,4 +12,5 @@ Reload Roam after updating, disabling, or uninstalling the extension.
 
 The background service worker only handles toolbar clicks and keyboard shortcuts.
 It does not run startup jobs, poll graphs, intercept navigation, or retain tabs.
-Roam's native loading screen and animation are unchanged.
+`runtime/loading.css` centers Roam's native loading astrolabe and makes it 15%
+smaller while preserving its animation.

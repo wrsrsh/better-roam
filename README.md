@@ -40,7 +40,7 @@ npm run zip
 
 load `extension/.output/chrome-mv3` for local builds. customize `vendor/theme/better-roam.css` and rebuild.
 
-Roam handles graph loading, storage, and sync. Better Roam leaves the native loading screen and animation intact and does not preload graphs, keep tabs alive, or open background windows. Click the extension icon to open a normal Roam tab.
+Roam handles graph loading, storage, and sync. Better Roam centers the native loading astrolabe and makes it 15% smaller, preserving its animation. It does not preload graphs, keep tabs alive, or open background windows. Click the extension icon to open a normal Roam tab.
 
 This is a Chrome extension only; old desktop releases remain historical.
 

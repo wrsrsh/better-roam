@@ -1,0 +1,10 @@
+/* Center Roam's native astrolabe and shrink it by 15%.
+   Individual transforms leave its own animation transforms intact. */
+.loading-astrolabe {
+  position: fixed !important;
+  inset: 50% auto auto 50% !important;
+  margin: 0 !important;
+  translate: -50% -50%;
+  scale: 0.85;
+  transform-origin: center;
+}
