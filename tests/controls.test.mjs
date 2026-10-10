@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const code = readFileSync(new URL('../extension/runtime/controls.js', import.meta.url), 'utf8');
-function setup({palette = false, emptyPage = false, editing = false} = {}) {
+function setup({palette = false, emptyPage = false, editing = false, origin = 'https://roamresearch.com'} = {}) {
   const timers = new Map(); let timerId = 0;
   const events = {}, keys = [], opened = [], state = {focused:false, selected:false, settings:false, blockClicks:0, scans:0};
   const page = {};
@@ -30,7 +30,7 @@ function setup({palette = false, emptyPage = false, editing = false} = {}) {
   vm.runInNewContext(code,{window,document,Element,URL,console,setTimeout(fn){timers.set(++timerId,fn);return timerId;},clearTimeout(id){timers.delete(id);},
     MutationObserver:class {constructor(callback){events.mutate=callback;} observe(){}},
     KeyboardEvent:class {constructor(type,args){Object.assign(this,{type},args);}},
-    location:{origin:'https://roamresearch.com',href:'https://roamresearch.com/#/app/test',hash:'#/app/test/page/test-page'},
+    location:{origin,href:origin+'/#/app/test',hash:'#/app/test/page/test-page'},
     localStorage:{getItem(){return null;},setItem(){}}
   });
   return {window,events,keys,opened,state,Element,tick(){const pending=[...timers.values()];timers.clear();pending.forEach(fn=>fn());}};
@@ -58,6 +58,27 @@ test('Cmd+K consumes the editor link shortcut and opens the palette',()=>{
   const x=setup();let cancelled=false;
   x.events['window:keydown']({key:'k',metaKey:true,isTrusted:true,preventDefault(){cancelled=true;},stopImmediatePropagation(){}});
   assert.equal(cancelled,true);assert.equal(x.state.palette,true);assert.deepEqual(x.keys,[]);
+});
+
+test('Ctrl+K opens the palette inside Roam without a Chrome command binding',()=>{
+  const x=setup();let cancelled=false;
+  x.events['window:keydown']({key:'k',ctrlKey:true,isTrusted:true,preventDefault(){cancelled=true;},stopImmediatePropagation(){}});
+  assert.equal(cancelled,true);assert.equal(x.state.palette,true);
+});
+
+test('other sites receive no shortcut handlers or Roam actions',()=>{
+  const x=setup({origin:'https://example.com'});
+  assert.equal(x.events['window:keydown'],undefined);
+  assert.equal(x.window.__betterRoamAction,undefined);
+});
+
+test('modified palette shortcuts remain available to Roam',()=>{
+  const x=setup();
+  for(const modifiers of [{metaKey:true,shiftKey:true},{ctrlKey:true,altKey:true},{metaKey:true,ctrlKey:true}]) {
+    x.events['window:keydown']({key:'k',isTrusted:true,...modifiers,
+      preventDefault(){throw Error('unrelated shortcut consumed');},stopImmediatePropagation(){throw Error('unrelated shortcut stopped');}});
+  }
+  assert.equal(Boolean(x.state.palette),false);
 });
 
 test('empty pages focus their first block once and do not steal an active editor',()=>{

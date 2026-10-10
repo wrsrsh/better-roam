@@ -185,10 +185,14 @@
       chooseSettings();
     }
   };
+  // Handle the palette here rather than reserving Cmd/Ctrl+K across Chrome.
   // Capture before Roam's editor shortcuts (Cmd+K normally inserts a link).
   window.addEventListener('keydown', event => {
-    if (!event.isTrusted || !event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
-    const action = { ',': 'settings', k: 'palette', o: 'search', n: 'new-page' }[event.key.toLowerCase()];
+    if (!event.isTrusted || event.altKey || event.shiftKey) return;
+    const key = event.key.toLowerCase();
+    const palette = key === 'k' && !!event.metaKey !== !!event.ctrlKey;
+    const action = palette ? 'palette' : event.metaKey && !event.ctrlKey
+      ? { ',': 'settings', o: 'search', n: 'new-page' }[key] : undefined;
     if (!action) return;
     event.preventDefault();
     event.stopImmediatePropagation();

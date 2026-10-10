@@ -17,7 +17,7 @@ Craft light/dark theme, a compact unified command palette, quick page creation w
 | command palette | ⌘K (Mac) / Ctrl+K |
 | settings | Alt+Shift+S |
 
-Alt is Option on Mac. customize at `chrome://extensions/shortcuts`; Chrome reserves shortcuts like Cmd+N and Cmd+O.
+Alt is Option on Mac. customize the Alt+Shift shortcuts at `chrome://extensions/shortcuts`; Chrome reserves shortcuts like Cmd+N and Cmd+O. ⌘K / Ctrl+K is handled only inside Roam tabs and leaves other sites' shortcuts available.
 
 ⌘K searches pages and block text. type `>` to show only commands. press Enter to open a result, Shift+Enter for the sidebar, or choose **Create** to make a page. settings, daily notes, sidebars, and Roam's full command menu are also available.
 
