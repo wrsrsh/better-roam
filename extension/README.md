@@ -12,5 +12,8 @@ Reload Roam after updating, disabling, or uninstalling the extension.
 
 The background service worker only handles toolbar clicks and keyboard shortcuts.
 It does not run startup jobs, poll graphs, intercept navigation, or retain tabs.
-`runtime/loading.css` centers Roam's native loading astrolabe and makes it 15%
+`runtime/loading.css` centers Roam's native loading astrolabe and makes it 38.5875%
 smaller while preserving its animation.
+Sidebar navigation icons, including Roam Depot, are hidden while labels remain.
+`runtime/page-cleanup.js` deletes empty, unreferenced pages once the graph loads,
+with a fresh content/reference check before each deletion.

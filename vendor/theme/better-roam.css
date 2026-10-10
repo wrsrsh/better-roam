@@ -75,6 +75,12 @@
 
 /* Self-contained defaults: no Depot module installation required. */
 #roam-sidebar-logo { display: none !important; }
+/* Keep sidebar navigation labels while hiding their icons, including Depot. */
+.roam-sidebar-container .roam-sidebar-content .icon,
+.roam-sidebar-container .roam-sidebar-content .log-button .bp3-icon,
+.roam-sidebar-container .roam-sidebar-content .bp3-button .bp3-icon-search {
+  display: none !important;
+}
 :root { --bb-topbar: none; --bb-left-sidebar__toprow: none; --bb-right-sidebar__toprow: none; }
 .rm-topbar { border-bottom: none !important; box-shadow: none !important; }
 

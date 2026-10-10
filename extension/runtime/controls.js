@@ -61,7 +61,7 @@
     const existing = await owner.pull('[:block/uid]', [':node/title', title]);
     checkGraph();
     const existingUid = existing?.[':block/uid'] || existing?.uid;
-    if (existingUid) {await api.ui.mainWindow.openPage({page: {uid: existingUid}}); return;}
+    if (existingUid) {await openPageAtEnd(existingUid); return;}
     const uid = api.util.generateUID();
     const create = api.data?.page?.create || api.createPage;
     await create.call(api.data?.page || api, {page: {title, uid}});
@@ -127,6 +127,51 @@
     };
     attempt();
   };
+  const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+  // The last visible block in document order, skipping collapsed children.
+  const lastBlock = node => {
+    const children = [...(node?.[':block/children'] || node?.children || [])]
+      .sort((a, b) => (a[':block/order'] ?? a.order ?? 0) - (b[':block/order'] ?? b.order ?? 0));
+    const last = children[children.length - 1];
+    if (!last) return null;
+    const open = last[':block/open'] ?? last.open ?? true;
+    return (open && lastBlock(last)) || {
+      uid: last[':block/uid'] || last.uid,
+      length: (last[':block/string'] ?? last.string ?? '').length
+    };
+  };
+  // Opening an existing page lands the caret after its last block so Enter
+  // continues the page instead of editing its first line.
+  let pendingEnd = null;
+  const focusEnd = async uid => {
+    const generation = ++focusGeneration;
+    const arrived = () => location.hash.endsWith('/page/' + uid);
+    const live = () => generation === focusGeneration;
+    for (let i = 0; i < 40 && live() && !arrived(); i++) await delay(75);
+    if (!live() || !arrived()) return;
+    const api = window.roamAlphaAPI;
+    const owner = api?.data?.async?.pull ? api.data.async : api?.data?.pull ? api.data : api;
+    let target = null;
+    try {
+      target = lastBlock(await owner?.pull?.('[:block/uid :block/string :block/order :block/open {:block/children ...}]', [':block/uid', uid]));
+    } catch (_) {}
+    if (!live() || !arrived()) return;
+    if (!target?.uid || typeof api?.ui?.setBlockFocusAndSelection !== 'function') { pendingEnd = null; focusContent(uid); return; }
+    const selection = {start: target.length, end: target.length};
+    for (let i = 0; i < 10 && live() && arrived(); i++) {
+      try { await api.ui.setBlockFocusAndSelection({location: {'block-uid': target.uid, 'window-id': 'main-window'}, selection}); } catch (_) {}
+      await delay(75);
+      if (live() && document.activeElement?.matches?.('textarea')) break;
+    }
+    if (live()) pendingEnd = null;
+  };
+  const openPageAtEnd = async uid => {
+    pendingEnd = uid;
+    await window.roamAlphaAPI.ui.mainWindow.openPage({page: {uid}});
+    // The hashchange handler may already have started this; whichever runs
+    // last wins and user input cancels either.
+    if (pendingEnd === uid) focusEnd(uid).catch(() => {});
+  };
   // Only inspect after navigation, never in response to editor DOM mutations.
   let pageFocusTimer;
   let navigationGeneration = 0;
@@ -140,6 +185,7 @@
     const generation = navigationGeneration;
     const uid = location.hash.match(/\/page\/([^/?]+)/)?.[1];
     if (!uid) return;
+    if (pendingEnd === uid) { focusEnd(uid).catch(() => {}); return; }
     let attempts = 0;
     const check = () => {
       if (generation !== navigationGeneration) return;
@@ -157,13 +203,15 @@
     };
     pageFocusTimer = setTimeout(check, 100);
   };
+  const userInput = () => { pendingEnd = null; cancelAutoFocus(); };
   window.addEventListener('hashchange', schedulePageFocus);
-  document.addEventListener('keydown', cancelAutoFocus, true);
-  document.addEventListener('pointerdown', cancelAutoFocus, true);
+  document.addEventListener('keydown', userInput, true);
+  document.addEventListener('pointerdown', userInput, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedulePageFocus, {once: true});
   else schedulePageFocus();
   window.__betterRoamAction = (action, value) => {
     if (action === 'create-page') return createPage(value);
+    if (action === 'open-page') return openPageAtEnd(value);
     if (action === 'roam-palette') { openPalette(); return; }
     if (action === 'new-page') { newPage(); return; }
     if (action === 'palette') { window.__betterRoamPalette?.(); return; }

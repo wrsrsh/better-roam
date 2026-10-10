@@ -2,13 +2,8 @@ node_modules/
 .DS_Store
 .env
 .env.*
-release/
 extension/.wxt/
 extension/.output/
 extension/generated/
 extension/public/icon.png
 extension/public/THEME-LICENSE.txt
-# Historical local build artifacts (not part of this extension).
-src-tauri/target/
-src-tauri/gen/
-adapter/dist/

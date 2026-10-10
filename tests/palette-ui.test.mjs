@@ -42,6 +42,13 @@ test('palette opens without graph reads, renders text safely and opens selected 
   assert.deepEqual(x.calls.map(c=>c[0]),['sidebar']);assert.equal(x.w.document.getElementById('better-roam-palette'),null);
   x.dom.window.close();
 });
+test('Enter on a page result opens it at the end of the page', async () => {
+  const x=fixture();const input=mount(x);
+  input.value='matching';input.dispatchEvent(new x.w.Event('input'));await wait(170);
+  input.dispatchEvent(new x.w.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));await wait(0);
+  assert.deepEqual(x.calls,[['open-page','p']]);assert.equal(x.w.document.getElementById('better-roam-palette'),null);
+  x.dom.window.close();
+});
 test('palette creation is explicit and Escape restores focus', async () => {
   const x=fixture();x.w.roamAlphaAPI.data.async.search=async()=>[];
   const input=mount(x);input.value='New test page';input.dispatchEvent(new x.w.Event('input'));await wait(170);

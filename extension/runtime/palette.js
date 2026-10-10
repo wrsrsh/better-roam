@@ -64,7 +64,7 @@ export function installPalette() {
         } else if (sidebar && api?.ui?.rightSidebar?.addWindow) {
           await api.ui.rightSidebar.addWindow({window: {type: item.kind === 'page' ? 'outline' : 'block', 'block-uid': item.uid}});
         } else if (item.kind === 'page') {
-          await api.ui.mainWindow.openPage({page: {uid: item.uid}});
+          await window.__betterRoamAction('open-page', item.uid);
         } else {
           await api.ui.mainWindow.openBlock({block: {uid: item.uid}});
         }

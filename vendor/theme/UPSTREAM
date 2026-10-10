@@ -2,4 +2,4 @@ Source: https://github.com/wrsrsh/roam-desktop-theme
 Fork commit: 1ac07be4c0aeee6c1958c367ef61eda775297468
 Original upstream: https://github.com/rcvd/RoamStudio
 Original license: MIT, Copyright (c) 2022 Alexander Rink
-Vendored subset: Craft Auto CSS, system/common CSS, Feather icons, desktop defaults.
+Vendored subset: Craft Auto CSS, system/common CSS, Feather icons, theme defaults.
